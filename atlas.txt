@@ -1,0 +1,6 @@
+Muchomurka cervená,0,cervena,4;
+Muchomurka cervená,0,cervena,5;
+Muchomurka cervená,0,cervena,7;
+salto salto,1,cae,4;
+salto salto,2,zelena,5;
+l,2,kkk,5;
