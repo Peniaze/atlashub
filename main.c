@@ -3,10 +3,10 @@
 #include <windows.h>
 #include "atlas.h"
 
-int zakladne_menu(void)
+int zakladni_menu(void)
 {
     system("cls");
-    printf("Interaktivny atlas hub\n\n1: Listuj v zozname\n2: Hladaj v atlase\n3: Zorad a vypis\n4: Dopln atlas\n5: Uloz atlas do suboru\n\n6: Opusti program\n\n Volba: \n");
+    printf("Interaktivní atlas hub\n\n1: Listuj v atlase\n2: Hledej v atlase\n3: Dopln atlas\n4: Uloz atlas do souboru\n\n5: Opusti program\n\n Volba: \n");
     int volba = 0;
     fflush(stdin);
     scanf("%d", &volba);
@@ -16,22 +16,20 @@ int zakladne_menu(void)
 	    listuj(atlas[0]);
 	    break;
 	case 2:
-	    if (!hladaj())
+	    if (!hledej())
 		uvolni_filter();
 	    break;
 	case 3:
+	    pridej_polozku();
 	    break;
 	case 4:
-	    pridaj_polozku();
+	    uloz_do_souboru();
 	    break;
 	case 5:
-	    uloz_do_suboru();
-	    break;
-	case 6:
 	    return 1;
 	default:
 	    system("cls");
-	    printf("Wrong input");
+	    printf("Spatná volba");
 	    Sleep(3000);
     }
     return 0;
@@ -56,16 +54,16 @@ int main()
     for (i=0; i<counter; i++)
     {
 	atlas[i] = malloc(sizeof(t_huba));
-	fscanf(subor, "%50[^,],%d,%20[^,],%d; ", atlas[i]->nazov, &atlas[i]->jedovatost, atlas[i]->farba, &atlas[i]->vyskyt);
-	pocet_poloziek++;
+	fscanf(subor, "%50[^,],%d,%20[^,],%d; ", atlas[i]->nazev, &atlas[i]->jedovatost, atlas[i]->barva, &atlas[i]->vyskyt);
+	pocet_polozek++;
 	if (i==0)
 	{
 	    atlas[i]->dalsi = 0;
-	    atlas[i]->predchadzjuci = 0;
+	    atlas[i]->predchadzjici = 0;
 	}
 	else
 	{
-	    atlas[i]->predchadzjuci = atlas[i-1];
+	    atlas[i]->predchadzjici = atlas[i-1];
 	    atlas[i-1]->dalsi = atlas[i];
 	    atlas[i]->dalsi = 0;
 	}
@@ -73,9 +71,9 @@ int main()
 
     printf("%d", counter);
     fclose(subor);
-    while (!zakladne_menu());
+    while (!zakladni_menu());
    // printf("Hello world!\n");
-    for (i=0; i<pocet_poloziek; i++)
+    for (i=0; i<pocet_polozek; i++)
     {
 	free(atlas[i]);
     }

@@ -30,7 +30,7 @@ else
     {
         switch (ch1)
         {
-        case 'a': return pridat;
+        case 'd': return pridat;
         case 'q': return odejit;
         case 13: return enter;
         }
@@ -38,7 +38,7 @@ else
 return pridat;
 }
 
-int hladaj(void)
+int hledej(void)
 {
     char vyraz[50];
     system("cls");
@@ -49,18 +49,18 @@ int hladaj(void)
     int i=0;
     while (polozka)
     {
-	if (strstr(polozka->nazov, vyraz) || strstr(polozka->farba, vyraz))
+	if (strstr(polozka->nazev, vyraz) || strstr(polozka->barva, vyraz))
 	{
 	    filter[i] = malloc(sizeof(t_huba));
 	    (*filter[i]) = (*polozka);
 	    if (i == 0)
 	    {
-		filter[i]->predchadzjuci = 0;
+		filter[i]->predchadzjici = 0;
 		filter[i]->dalsi = 0;
 	    }
 	    else
 	    {
-		filter[i]->predchadzjuci = filter[i-1];
+		filter[i]->predchadzjici = filter[i-1];
 		filter[i]->dalsi = 0;
 		filter[i-1]->dalsi = filter[i];
 	    }
@@ -85,7 +85,7 @@ void uvolni_filter(void)
     while (polozka->dalsi)
     {
 	polozka = polozka->dalsi;
-	free(polozka->predchadzjuci);
+	free(polozka->predchadzjici);
     }
     free(polozka);
 }
@@ -93,7 +93,7 @@ void uvolni_filter(void)
 
 void vypis_polozku(t_huba* polozka)
 {
-    printf("Nazov huby: %s\n", polozka->nazov);
+    printf("Nazov huby: %s\n", polozka->nazev);
     switch (polozka->jedovatost)
     {
 	case 0:
@@ -106,27 +106,27 @@ void vypis_polozku(t_huba* polozka)
 	    printf("Tato huba nie je jedla.\n");
 	    break;
     }
-    printf("Farba klobuka: %s\nHuba sa najcastejsie vyskytuje v mesiaci ", polozka->farba);	
+    printf("Farba klobuka: %s\nHuba sa najcastejsie vyskytuje v mesiaci ", polozka->barva);	
     switch (polozka->vyskyt)
     {
-	case 1:		    printf("Januar.\n");	    break;
-	case 2:		    printf("Unor.\n");		    break;
-	case 3:		    printf("Brezen.\n");	    break;
-	case 4:		    printf("Duben.\n");		    break;
-	case 5:		    printf("Kveten.\n");	    break;
-	case 6:		    printf("Cerven.\n");	    break;
-	case 7:		    printf("Cervenec.\n");	    break;
-	case 8:		    printf("Srpen.\n");		    break;
-	case 9:		    printf("Zari.\n");		    break;
-	case 10:	    printf("Rijen.\n");		    break;
-	case 11:	    printf("Listopad.\n");	    break;
-	case 12:	    printf("Prosinec.\n");	    break;
+	case 1:printf("Leden.\n");break;
+	case 2:printf("Unor.\n");break;
+	case 3:printf("Brezen.\n");break;
+	case 4:printf("Duben.\n");break;
+	case 5:printf("Kveten.\n");break;
+	case 6:printf("Cerven.\n");break;
+	case 7:printf("Cervenec.\n");break;
+	case 8:printf("Srpen.\n");break;
+	case 9:printf("Zari.\n");break;
+	case 10:printf("Rijen.\n");break;
+	case 11:printf("Listopad.\n");break;
+	case 12:printf("Prosinec.\n");break;
     }
     printf("\n\n");
     if (polozka->dalsi)
-	printf("Dalsia huba -> %s\n", (polozka->dalsi)->nazov);
-    if (polozka->predchadzjuci)
-	printf("Predchadzajuca huba -> %s\n", (polozka->predchadzjuci)->nazov);
+	printf("Nasledujici huba -> %s\n", (polozka->dalsi)->nazev);
+    if (polozka->predchadzjici)
+	printf("Predchadzajici huba -> %s\n", (polozka->predchadzjici)->nazev);
 }
 
 void listuj(t_huba* prva_polozka)
@@ -136,38 +136,67 @@ void listuj(t_huba* prva_polozka)
     do
     {
 	system("cls");
-	printf("Stlac 'q' pre opustenie\n\n");
+	printf("Stiskni 'q' pro opusteni\nStiskni 'd' pro vymazani polozky\n\n");
 	vypis_polozku(polozka);
 	key = vyber();
-	if ((key == nahoru) && (polozka->predchadzjuci))
-	    polozka = polozka->predchadzjuci;
+	if ((key == nahoru) && (polozka->predchadzjici))
+	    polozka = polozka->predchadzjici;
 	if ((key == dolu) && (polozka->dalsi))
 	    polozka = polozka->dalsi;
+	if (key == pridat)
+	{
+	    if (polozka->dalsi)
+	    {
+		polozka = polozka->dalsi;
+		vymaz_polozku(polozka->predchadzjici);
+	    }
+	    else
+	    {
+		polozka = polozka->predchadzjici;
+		vymaz_polozku(polozka->dalsi);
+	    }
+	}
     } while(key != odejit);
 }
 
 
 
-void uloz_do_suboru(void)
+void uloz_do_souboru(void)
 {
     FILE* subor;
     subor = fopen("atlas.txt", "w");
-    for (int i=0; i<pocet_poloziek; i++)
+    for (int i=0; i<pocet_polozek; i++)
     {
-	fprintf(subor, "%s,%d,%s,%d;\n", atlas[i]->nazov, (atlas[i]->jedovatost), atlas[i]->farba, (atlas[i]->vyskyt));
+	fprintf(subor, "%s,%d,%s,%d;\n", atlas[i]->nazev, (atlas[i]->jedovatost), atlas[i]->barva, (atlas[i]->vyskyt));
     }
     fclose(subor);
 }
 
-void pridaj_polozku(void)
+void vymaz_polozku(t_huba* polozka)
 {
-    atlas[pocet_poloziek] = malloc(sizeof(t_huba));
+    if (polozka->dalsi)
+	(polozka->dalsi)->predchadzjici = polozka->predchadzjici;
+    else
+	(polozka->predchadzjici)->dalsi = 0;
+    if (polozka->predchadzjici)
+	(polozka->predchadzjici)->dalsi = polozka->dalsi;
+    else
+	(polozka->dalsi)->predchadzjici = 0;
+    free(polozka);
+    polozka = 0;
+    pocet_polozek--;
+}
+
+
+void pridej_polozku(void)
+{
+    atlas[pocet_polozek] = malloc(sizeof(t_huba));
     system("cls");
-    printf("Pridej polozku.\n\nNazov huby:");
+    printf("Pridej polozku.\n\nNazev huby:");
     char buff[50];
     fflush(stdin);
     scanf("%50[^\n]", buff);
-    strcpy(atlas[pocet_poloziek]->nazov, buff);
+    strcpy(atlas[pocet_polozek]->nazev, buff);
     printf("Jedovata: \n");
     char temp_jedovatost = 0;
     t_akce key;
@@ -184,15 +213,15 @@ void pridaj_polozku(void)
         if ((key==dolu)&&(temp_jedovatost<2)) temp_jedovatost++;
     }
     while (key!=enter);
-    atlas[pocet_poloziek]->jedovatost = temp_jedovatost;
-    printf("\nFarba: ");
-    scanf("%20[^\n]", atlas[pocet_poloziek]->farba);
-    printf("Mesiac vyskytu: ");
-    scanf("%d", &(atlas[pocet_poloziek]->vyskyt));
-    printf("%s",atlas[pocet_poloziek]->nazov);
-    atlas[pocet_poloziek]->predchadzjuci = atlas[pocet_poloziek-1];
-    atlas[pocet_poloziek]->dalsi = 0;
-    atlas[pocet_poloziek-1]->dalsi = atlas[pocet_poloziek];
-    pocet_poloziek++;
+    atlas[pocet_polozek]->jedovatost = temp_jedovatost;
+    printf("\nBarva: ");
+    scanf("%20[^\n]", atlas[pocet_polozek]->barva);
+    printf("Mesic vyskytu: ");
+    scanf("%d", &(atlas[pocet_polozek]->vyskyt));
+    printf("%s",atlas[pocet_polozek]->nazev);
+    atlas[pocet_polozek]->predchadzjici = atlas[pocet_polozek-1];
+    atlas[pocet_polozek]->dalsi = 0;
+    atlas[pocet_polozek-1]->dalsi = atlas[pocet_polozek];
+    pocet_polozek++;
     return;
 }
